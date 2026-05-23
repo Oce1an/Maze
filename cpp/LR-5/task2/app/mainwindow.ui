@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>700</width><height>520</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Задание 2 — Динамическая библиотека String</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+
+    <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_func">
+        <property name="text"><string>Функция:</string></property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="funcCombo"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_s1">
+        <property name="text"><string>s1 (строка 1):</string></property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="s1Edit">
+        <property name="placeholderText"><string>Введите первую строку</string></property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_s2">
+        <property name="text"><string>s2 (строка 2 / разделитель):</string></property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="s2Edit">
+        <property name="placeholderText"><string>Введите вторую строку</string></property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_n">
+        <property name="text"><string>n / errno:</string></property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="nEdit">
+        <property name="placeholderText"><string>Число байт / символов (если нужно)</string></property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+
+    <item>
+     <widget class="QPushButton" name="runButton">
+      <property name="text"><string>Выполнить</string></property>
+     </widget>
+    </item>
+
+    <item>
+     <widget class="QLabel" name="label_result">
+      <property name="text"><string>Результат:</string></property>
+     </widget>
+    </item>
+
+    <item>
+     <widget class="QTextBrowser" name="resultBrowser"/>
+    </item>
+
+   </layout>
+  </widget>
+ </widget>
+</ui>

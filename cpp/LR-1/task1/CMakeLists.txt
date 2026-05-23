@@ -1,19 +1,32 @@
 cmake_minimum_required(VERSION 3.16)
-
-project(Car)
+project(car LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_AUTOMOC ON)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+qt6_standard_project_setup()
 
-add_executable(Car
+set(SOURCES
     main.cpp
-    mainwindow/mainwindow.cpp
-    movingrect/movingrect.cpp
-    car/car.cpp
-    canvas/canvas.cpp
+    src/MainWindow.cpp
+    src/MovingRectangle.cpp
+    src/Car.cpp
+    src/DrawingWidget.cpp
 )
 
-target_link_libraries(Car Qt6::Widgets)
+set(HEADERS
+    hdr/MainWindow.h
+    hdr/MovingRectangle.h
+    hdr/Car.h
+    hdr/DrawingWidget.h
+)
+
+add_executable(car ${SOURCES} ${HEADERS})
+
+target_link_libraries(car Qt6::Core Qt6::Widgets)
+
+set_target_properties(car PROPERTIES
+    WIN32_EXECUTABLE TRUE
+)

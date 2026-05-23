@@ -1,5 +1,0 @@
-C:/vsprojects/cpp/LR-1/task2/build/CMakeFiles/main.dir
-C:/vsprojects/cpp/LR-1/task2/build/CMakeFiles/edit_cache.dir
-C:/vsprojects/cpp/LR-1/task2/build/CMakeFiles/rebuild_cache.dir
-C:/vsprojects/cpp/LR-1/task2/build/CMakeFiles/main_autogen_timestamp_deps.dir
-C:/vsprojects/cpp/LR-1/task2/build/CMakeFiles/main_autogen.dir

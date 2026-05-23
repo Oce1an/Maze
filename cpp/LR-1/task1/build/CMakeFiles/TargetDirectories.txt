@@ -1,5 +1,0 @@
-C:/vsprojects/cpp/LR-1/task1-1/build/CMakeFiles/Car.dir
-C:/vsprojects/cpp/LR-1/task1-1/build/CMakeFiles/edit_cache.dir
-C:/vsprojects/cpp/LR-1/task1-1/build/CMakeFiles/rebuild_cache.dir
-C:/vsprojects/cpp/LR-1/task1-1/build/CMakeFiles/Car_autogen_timestamp_deps.dir
-C:/vsprojects/cpp/LR-1/task1-1/build/CMakeFiles/Car_autogen.dir

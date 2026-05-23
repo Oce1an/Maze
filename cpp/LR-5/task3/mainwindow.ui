@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>780</width><height>640</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Задание 3 — Класс BitSet</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout">
+      <item><widget class="QLabel" name="lblSzA"><property name="text"><string>Размер A:</string></property></widget></item>
+      <item><widget class="QLineEdit" name="sizeEditA"><property name="placeholderText"><string>8</string></property></widget></item>
+      <item><widget class="QLabel" name="lblInitA"><property name="text"><string>Init A (число):</string></property></widget></item>
+      <item><widget class="QLineEdit" name="initEditA"><property name="placeholderText"><string>необязательно</string></property></widget></item>
+      <item><widget class="QLabel" name="lblSzB"><property name="text"><string>  Размер B:</string></property></widget></item>
+      <item><widget class="QLineEdit" name="sizeEditB"><property name="placeholderText"><string>8</string></property></widget></item>
+      <item><widget class="QLabel" name="lblInitB"><property name="text"><string>Init B:</string></property></widget></item>
+      <item><widget class="QLineEdit" name="initEditB"><property name="placeholderText"><string>необязательно</string></property></widget></item>
+      <item><widget class="QPushButton" name="createButton"><property name="text"><string>Создать</string></property></widget></item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QFormLayout">
+      <item row="0" column="0"><widget class="QLabel" name="lblA"><property name="text"><string>BitSet A:</string></property></widget></item>
+      <item row="0" column="1"><widget class="QLabel" name="displayA"><property name="text"><string>(не создан)</string></property><property name="font"><font><family>Courier</family><pointsize>12</pointsize></font></property></widget></item>
+      <item row="1" column="0"><widget class="QLabel" name="lblB"><property name="text"><string>BitSet B:</string></property></widget></item>
+      <item row="1" column="1"><widget class="QLabel" name="displayB"><property name="text"><string>(не создан)</string></property><property name="font"><font><family>Courier</family><pointsize>12</pointsize></font></property></widget></item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item><widget class="QLabel" name="lblPos"><property name="text"><string>Позиция (A):</string></property></widget></item>
+      <item><widget class="QSpinBox" name="posSpinA"><property name="minimum"><number>0</number></property><property name="maximum"><number>255</number></property></widget></item>
+      <item><widget class="QPushButton" name="setButton"><property name="text"><string>set(pos)</string></property></widget></item>
+      <item><widget class="QPushButton" name="resetButton"><property name="text"><string>reset(pos)</string></property></widget></item>
+      <item><widget class="QPushButton" name="flipButton"><property name="text"><string>flip(pos)</string></property></widget></item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item><widget class="QPushButton" name="setAllButton"><property name="text"><string>set() все</string></property></widget></item>
+      <item><widget class="QPushButton" name="resetAllButton"><property name="text"><string>reset() все</string></property></widget></item>
+      <item><widget class="QPushButton" name="flipAllButton"><property name="text"><string>flip() все</string></property></widget></item>
+      <item><widget class="QPushButton" name="andButton"><property name="text"><string>A &amp; B</string></property></widget></item>
+      <item><widget class="QPushButton" name="orButton"><property name="text"><string>A | B</string></property></widget></item>
+      <item><widget class="QPushButton" name="notButton"><property name="text"><string>~A</string></property></widget></item>
+      <item><widget class="QPushButton" name="statsButton"><property name="text"><string>Статистика A</string></property></widget></item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="lblLog"><property name="text"><string>Журнал операций:</string></property></widget>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="logBrowser"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+</ui>
