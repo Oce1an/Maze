@@ -1,0 +1,9 @@
+build/
+cmake-build-*/
+*.user
+*.autosave
+CMakeCache.txt
+CMakeFiles/
+Makefile
+*.exe
+!README.md
