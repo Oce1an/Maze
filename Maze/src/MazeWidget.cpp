@@ -44,12 +44,22 @@ int statePriority(SearchCellState state) {
 
 QColor frontierByDepth(int depth, int maxDepth) {
     const double t = maxDepth > 0 ? std::clamp(depth / static_cast<double>(maxDepth), 0.0, 1.0) : 0.0;
-    return QColor::fromHsvF(static_cast<float>(0.58 - t * 0.12), 0.55f + static_cast<float>(t) * 0.25f, 0.55f + static_cast<float>(t) * 0.4f, 0.92f);
+    return QColor::fromHsvF(
+        static_cast<float>(0.60 - t * 0.15),
+        0.50f + static_cast<float>(t) * 0.20f,
+        0.45f + static_cast<float>(t) * 0.35f,
+        0.92f
+    );
 }
 
 QColor expandedByDepth(int depth, int maxDepth) {
     const double t = maxDepth > 0 ? std::clamp(depth / static_cast<double>(maxDepth), 0.0, 1.0) : 0.0;
-    return QColor::fromHsvF(static_cast<float>(0.48 - t * 0.1), 0.5f, 0.5f + static_cast<float>(t) * 0.45f, 0.88f);
+    return QColor::fromHsvF(
+        static_cast<float>(0.48 - t * 0.1),
+        0.50f,
+        0.50f + static_cast<float>(t) * 0.45f,
+        0.88f
+    );
 }
 
 QColor pathColor(int step, int total) {
@@ -134,6 +144,7 @@ MazeWidget::MazeWidget(QWidget* parent) : QWidget(parent) {
 
 void MazeWidget::setMaze(Maze* maze) {
     m_maze = maze;
+    resetPathAndAnimation();
     update();
 }
 
@@ -151,15 +162,27 @@ void MazeWidget::setAnimationSpeed(int speedLevel) {
 }
 
 int MazeWidget::stepsPerTick() const {
-    const int total = m_pathPhase ? static_cast<int>(m_pendingResult.path.size())
-                                  : static_cast<int>(m_pendingResult.trace.size());
-    if (total <= 0) {
-        return 1;
-    }
+    if (m_pathPhase) {
+        const int pathLen = static_cast<int>(m_pendingResult.path.size());
+        if (pathLen <= 0) {
+            return 1;
+        }
+        
+        const double norm = (m_speedLevel - 1) / 99.0;
+        const int baseSteps = std::max(3, pathLen / 15);
+        const int maxBatch = std::max(baseSteps, pathLen / 16);
+        
+        return std::max(baseSteps, baseSteps + static_cast<int>(norm * norm * (maxBatch - baseSteps)));
+    } else {
+        const int total = static_cast<int>(m_pendingResult.trace.size());
+        if (total <= 0) {
+            return 1;
+        }
 
-    const double norm = (m_speedLevel - 1) / 99.0;
-    const int maxBatch = std::max(1, total / 25);
-    return std::max(1, 1 + static_cast<int>(norm * norm * (maxBatch - 1)));
+        const double norm = (m_speedLevel - 1) / 99.0;
+        const int maxBatch = std::max(1, total / 25);
+        return std::max(1, 1 + static_cast<int>(norm * norm * (maxBatch - 1)));
+    }
 }
 
 int MazeWidget::pathVisualLength() const {
@@ -183,6 +206,16 @@ void MazeWidget::resetAnimation() {
     m_traceIndex = 0;
     m_pathRevealIndex = 0;
     m_pathPhase = false;
+}
+
+void MazeWidget::resetPathAndAnimation() {
+    resetAnimation();
+    m_pendingResult = SolveResult{};
+    if (m_maze) {
+        m_maze->clearPath();
+        m_maze->clearSearchOverlay();
+    }
+    update();
 }
 
 void MazeWidget::pauseAnimation() {
@@ -274,6 +307,7 @@ void MazeWidget::advanceAnimationFrame() {
         }
         if (m_traceIndex >= static_cast<int>(m_pendingResult.trace.size())) {
             m_pathPhase = true;
+            m_pathRevealIndex = 0;
         }
     } else if (m_pendingResult.found) {
         int steps = 0;
@@ -385,74 +419,104 @@ void MazeWidget::drawMaze(QPainter& painter, const LayoutMetrics& lm) {
 
     painter.setPen(Qt::NoPen);
     
-    // Получаем координаты старта и финиша в grid координатах
     const QPoint startGrid = Maze::roomToGrid(m_maze->start().x(), m_maze->start().y());
     const QPoint endGrid = Maze::roomToGrid(m_maze->end().x(), m_maze->end().y());
     
     static QColor wallClr = wallColor();
 
+    QSet<QPoint> pathCells;
+    QHash<QPoint, int> pathStepIndex; 
+    
+    const bool hasPathAnimation = m_hasActiveAnimation && m_pathPhase;
+    const bool hasInstantPath = !m_hasActiveAnimation && !m_maze->path().empty();
+    
+    if (hasPathAnimation || hasInstantPath) {
+        const auto& path = hasPathAnimation ? m_pendingResult.path : m_maze->path();
+        const int revealedCount = hasPathAnimation ? m_pathRevealIndex : static_cast<int>(path.size());
+        
+        for (int i = 0; i < revealedCount && i < static_cast<int>(path.size()); ++i) {
+            const QPoint& room = path[i];
+            QPoint gridPos = Maze::roomToGrid(room.x(), room.y());
+            pathCells.insert(gridPos);
+            pathStepIndex[gridPos] = i;
+            
+            if (i > 0) {
+                const QPoint& prevRoom = path[i - 1];
+                QPoint prevGridPos = Maze::roomToGrid(prevRoom.x(), prevRoom.y());
+                QPoint corridorPos(
+                    (gridPos.x() + prevGridPos.x()) / 2,
+                    (gridPos.y() + prevGridPos.y()) / 2
+                );
+                pathCells.insert(corridorPos);
+                pathStepIndex[corridorPos] = i - 1; 
+            }
+        }
+    }
+
     for (int gy = 0; gy < gh; ++gy) {
         for (int gx = 0; gx < gw; ++gx) {
             const QRect r(gx * cell, gy * cell, cell, cell);
+            const QPoint gridPos(gx, gy);
             
-            // Стены
             if (m_maze->isWall(gx, gy)) {
                 painter.setBrush(wallClr);
                 painter.drawRect(r);
                 continue;
             }
-            
-            // Проверяем, является ли клетка стартом или финишем
+
+            if (pathCells.contains(gridPos)) {
+                int stepIndex = pathStepIndex.value(gridPos, 0);
+                const int totalPathSize = std::max(1, static_cast<int>(
+                    m_pendingResult.path.size() > 0 ? m_pendingResult.path.size() : m_maze->path().size()
+                ));
+                painter.setBrush(pathColor(stepIndex, totalPathSize));
+                painter.drawRect(r);
+                continue;
+            }
+
             const bool isStart = (gx == startGrid.x() && gy == startGrid.y());
             const bool isEnd = (gx == endGrid.x() && gy == endGrid.y());
             
             if (isStart) {
-                // Зеленая клетка старта с градиентом
                 QLinearGradient grad(r.topLeft(), r.bottomRight());
                 grad.setColorAt(0, QColor(76, 175, 80));
                 grad.setColorAt(1, QColor(46, 125, 50));
                 painter.setBrush(grad);
                 painter.drawRect(r);
-                
-                // Белая рамка для выделения
-                painter.setPen(QPen(QColor(255, 255, 255, 180), 2));
-                painter.drawRect(r.adjusted(1, 1, -1, -1));
-                painter.setPen(Qt::NoPen);
                 continue;
             }
             
             if (isEnd) {
-                // Красная клетка финиша с градиентом
                 QLinearGradient grad(r.topLeft(), r.bottomRight());
                 grad.setColorAt(0, QColor(239, 83, 80));
                 grad.setColorAt(1, QColor(198, 40, 40));
                 painter.setBrush(grad);
                 painter.drawRect(r);
-                
-                // Белая рамка для выделения
-                painter.setPen(QPen(QColor(255, 255, 255, 180), 2));
-                painter.drawRect(r.adjusted(1, 1, -1, -1));
-                painter.setPen(Qt::NoPen);
                 continue;
             }
-            
-            // Оверлей для поиска пути
+
             bool overlayDrawn = false;
-            if (m_maze->isRoomCell(gx, gy) && m_maze->isPassage(gx, gy)) {
-                const QPoint room = m_maze->gridToRoom(gx, gy);
-                if (auto overlay = overlayAtRoom(*m_maze, m_maze->index(room.x(), room.y()))) {
-                    painter.setBrush(colorForOverlay(overlay->state, overlay->depth, maxDepth, pathLen));
-                    painter.drawRect(r);
-                    overlayDrawn = true;
-                }
-            } else if (m_maze->isPassage(gx, gy)) {
-                if (auto overlay = overlayAtCorridor(*m_maze, gx, gy)) {
-                    painter.setBrush(colorForOverlay(overlay->state, overlay->depth, maxDepth, pathLen));
-                    painter.drawRect(r);
-                    overlayDrawn = true;
+            if (m_hasActiveAnimation || hasInstantPath) {
+                if (m_maze->isRoomCell(gx, gy) && m_maze->isPassage(gx, gy)) {
+                    const QPoint room = m_maze->gridToRoom(gx, gy);
+                    if (auto overlay = overlayAtRoom(*m_maze, m_maze->index(room.x(), room.y()))) {
+                        if (overlay->state != SearchCellState::Path) {
+                            painter.setBrush(colorForOverlay(overlay->state, overlay->depth, m_maze->maxSearchDistance(), pathVisualLength()));
+                            painter.drawRect(r);
+                            overlayDrawn = true;
+                        }
+                    }
+                } else if (m_maze->isPassage(gx, gy)) {
+                    if (auto overlay = overlayAtCorridor(*m_maze, gx, gy)) {
+                        if (overlay->state != SearchCellState::Path) {
+                            painter.setBrush(colorForOverlay(overlay->state, overlay->depth, m_maze->maxSearchDistance(), pathVisualLength()));
+                            painter.drawRect(r);
+                            overlayDrawn = true;
+                        }
+                    }
                 }
             }
-            
+
             if (!overlayDrawn) {
                 const bool isRoom = m_maze->isRoomCell(gx, gy);
                 painter.setBrush(passageColor(gx, gy, isRoom));
@@ -478,7 +542,7 @@ void MazeWidget::mousePressEvent(QMouseEvent* event) {
         return;
     }
 
-    resetAnimation();
+    resetPathAndAnimation();)
     if (m_placementMode == PlacementMode::Start) {
         m_maze->setStart(room);
         emit startChanged(room);

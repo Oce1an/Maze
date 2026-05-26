@@ -18,7 +18,7 @@ enum class SearchCellState : uint8_t {
 
 class Maze {
 public:
-    static constexpr int kMaxTraceSteps = 50000;
+    static constexpr int kMaxTraceSteps = 5000000;
 
     Maze(int width = 31, int height = 21);
 

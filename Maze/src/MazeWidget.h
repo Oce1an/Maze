@@ -29,6 +29,7 @@ public:
     void resumeAnimation();
     void startAnimation(const SolveResult& result);
     void applyResultInstant(const SolveResult& result);
+    void resetPathAndAnimation();
 
 signals:
     void startChanged(const QPoint& p);
@@ -65,7 +66,7 @@ private:
 
     bool m_animationEnabled{true};
     int m_speedLevel{50};
-    static constexpr int kAnimTimerMs = 16;
+    static constexpr int kAnimTimerMs = 13;
     bool m_animRunning{false};
     bool m_animPaused{false};
     bool m_hasActiveAnimation{false};
