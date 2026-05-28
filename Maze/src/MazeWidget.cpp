@@ -132,7 +132,7 @@ std::optional<OverlaySample> overlayAtCorridor(const Maze& maze, int gx, int gy)
     return merged;
 }
 
-} // namespace
+}
 
 MazeWidget::MazeWidget(QWidget* parent) : QWidget(parent) {
     setMinimumSize(480, 360);
@@ -169,7 +169,7 @@ int MazeWidget::stepsPerTick() const {
         }
         
         const double norm = (m_speedLevel - 1) / 99.0;
-        const int baseSteps = std::max(3, pathLen / 15);
+        const int baseSteps = std::max(3, pathLen / 30);
         const int maxBatch = std::max(baseSteps, pathLen / 16);
         
         return std::max(baseSteps, baseSteps + static_cast<int>(norm * norm * (maxBatch - baseSteps)));
@@ -542,7 +542,7 @@ void MazeWidget::mousePressEvent(QMouseEvent* event) {
         return;
     }
 
-    resetPathAndAnimation();)
+    resetPathAndAnimation();
     if (m_placementMode == PlacementMode::Start) {
         m_maze->setStart(room);
         emit startChanged(room);

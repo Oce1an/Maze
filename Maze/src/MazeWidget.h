@@ -23,7 +23,6 @@ public:
     bool isAnimating() const { return m_animRunning; }
     bool isAnimationPaused() const { return m_animPaused; }
     bool hasActiveAnimation() const { return m_hasActiveAnimation; }
-
     void resetAnimation();
     void pauseAnimation();
     void resumeAnimation();
@@ -66,7 +65,7 @@ private:
 
     bool m_animationEnabled{true};
     int m_speedLevel{50};
-    static constexpr int kAnimTimerMs = 13;
+    static constexpr int kAnimTimerMs = 30;
     bool m_animRunning{false};
     bool m_animPaused{false};
     bool m_hasActiveAnimation{false};

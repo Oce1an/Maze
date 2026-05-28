@@ -16,6 +16,8 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QScrollArea>
+#include <QScrollArea>
 
 #include <algorithm>
 
@@ -39,23 +41,22 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     auto* title = new QLabel(QStringLiteral("Maze Pathfinder"), leftPanel);
     title->setObjectName(QStringLiteral("AppTitle"));
-    auto* subtitle = new QLabel(QStringLiteral("Генерация и поиск пути"), leftPanel);
-    subtitle->setObjectName(QStringLiteral("AppSubtitle"));
     leftLayout->addWidget(title);
-    leftLayout->addWidget(subtitle);
 
     auto* sizeGroup = new QGroupBox(QStringLiteral("Размер лабиринта"), leftPanel);
     auto* sizeForm = new QFormLayout(sizeGroup);
     m_widthSpin = new QSpinBox(sizeGroup);
     m_heightSpin = new QSpinBox(sizeGroup);
-    m_widthSpin->setRange(5, 200);
-    m_heightSpin->setRange(5, 200);
+    m_widthSpin->setRange(5, 1000);
+    m_heightSpin->setRange(5, 1000);
     m_widthSpin->setSingleStep(1);
     m_heightSpin->setSingleStep(1);
     m_widthSpin->setValue(m_maze.width());
     m_heightSpin->setValue(m_maze.height());
     sizeForm->addRow(QStringLiteral("Ширина"), m_widthSpin);
     sizeForm->addRow(QStringLiteral("Высота"), m_heightSpin);
+    m_widthSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    m_heightSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
     auto* genGroup = new QGroupBox(QStringLiteral("Генерация"), leftPanel);
     auto* genLayout = new QVBoxLayout(genGroup);
@@ -166,18 +167,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         updateDebugPanel();
     });
 
+
     updateDebugPanel();
     onGenerate();
 }
 
 void MainWindow::applyTheme() {
     setStyleSheet(QStringLiteral(R"(
-        QMainWindow, QWidget {
-            background-color: #12151c;
-            color: #e8ecf4;
-            font-family: "Segoe UI", sans-serif;
-            font-size: 13px;
-        }
         #SidePanel, #CanvasPanel {
             background-color: #1a1f2b;
             border: 1px solid #2d3548;
@@ -186,11 +182,7 @@ void MainWindow::applyTheme() {
         #AppTitle {
             font-size: 20px;
             font-weight: 700;
-            color: #ffffff;
-        }
-        #AppSubtitle {
-            color: #9aa6bf;
-            margin-bottom: 6px;
+            color: #b0bdd6;
         }
         QGroupBox {
             border: 1px solid #2d3548;
@@ -210,13 +202,83 @@ void MainWindow::applyTheme() {
             font-family: "Consolas", "Cascadia Mono", monospace;
             font-size: 12px;
         }
-        QComboBox, QSpinBox {
+        QComboBox {
             background: #252b3a;
             border: 1px solid #3a455c;
             border-radius: 6px;
             padding: 4px 8px;
             min-height: 26px;
         }
+        
+        QSpinBox {
+            background: #252b3a;
+            border: 1px solid #3a455c;
+            border-radius: 6px;
+            padding: 4px 8px;
+            padding-right: 22px;
+            min-height: 26px;
+            color: #e8ecf4;
+        }
+        
+        QSpinBox::up-button, QSpinBox::down-button {
+            background: #3a455c;
+            width: 20px;
+            border: none;
+            border-radius: 3px;
+        }
+        
+        QSpinBox::up-button {
+            subcontrol-position: top right;
+            margin-top: 2px;
+            margin-right: 2px;
+            margin-bottom: 1px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+        }
+        
+        QSpinBox::down-button {
+            subcontrol-position: bottom right;
+            margin-bottom: 2px;
+            margin-right: 2px;
+            margin-top: 1px;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+        }
+        
+        QSpinBox::up-arrow {
+            image: none;
+            width: 0px;
+            height: 0px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 6px solid #64b5f6;
+        }
+        
+        QSpinBox::down-arrow {
+            image: none;
+            width: 0px;
+            height: 0px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #64b5f6;
+        }
+        
+        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+            background: #536dfe;
+        }
+        
+        QSpinBox::up-button:hover::up-arrow {
+            border-bottom-color: white;
+        }
+        
+        QSpinBox::down-button:hover::down-arrow {
+            border-top-color: white;
+        }
+        
+        QSpinBox::up-button:pressed, QSpinBox::down-button:pressed {
+            background: #1e2433;
+        }
+        
         QPushButton {
             background: #2f3749;
             border: 1px solid #44506a;
@@ -262,13 +324,6 @@ void MainWindow::onGenerate() {
     m_mazeWidget->resetAnimation();
     setControlsEnabled(true);
     m_stopAnimBtn->setEnabled(false);
-    
-    if (m_maze.width() > 300 || m_maze.height() > 300) {
-        QMessageBox::warning(
-            this,
-            QStringLiteral("Предупреждение"),
-            QStringLiteral("Большой лабиринт может работать медленно. Рекомендуемый размер: до 300x300."));
-    }
     
     MazeGenerator* generator = MazeGenerator::byIndex(m_generatorCombo->currentIndex());
     if (!generator) {
