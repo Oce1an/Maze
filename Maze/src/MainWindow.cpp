@@ -263,12 +263,11 @@ void MainWindow::onGenerate() {
     setControlsEnabled(true);
     m_stopAnimBtn->setEnabled(false);
     
-    // Проверка на слишком большой лабиринт
     if (m_maze.width() > 300 || m_maze.height() > 300) {
         QMessageBox::warning(
             this,
             QStringLiteral("Предупреждение"),
-            QStringLiteral("Большой лабиринт может работать медленно. Рекомендуемый размер: до 200x200."));
+            QStringLiteral("Большой лабиринт может работать медленно. Рекомендуемый размер: до 300x300."));
     }
     
     MazeGenerator* generator = MazeGenerator::byIndex(m_generatorCombo->currentIndex());
@@ -276,7 +275,6 @@ void MainWindow::onGenerate() {
         return;
     }
     
-    // Блокируем UI во время генерации для больших лабиринтов
     QApplication::setOverrideCursor(Qt::WaitCursor);
     generator->generate(m_maze);
     QApplication::restoreOverrideCursor();

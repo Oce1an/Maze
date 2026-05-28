@@ -118,7 +118,7 @@ struct PQNode {
     bool operator>(const PQNode& other) const { return priority > other.priority; }
 };
 
-} // namespace
+}
 
 SolveResult weightedGridSearch(
     Maze& maze,
@@ -203,4 +203,4 @@ SolveResult weightedGridSearch(
     return result;
 }
 
-} // namespace
+}

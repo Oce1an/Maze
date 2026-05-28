@@ -79,4 +79,4 @@ SolveResult weightedGridSearch(
     bool guaranteesShortest,
     const std::function<int(int cellIdx, int gScore)>& priorityKey);
 
-} // namespace
+}

@@ -19,7 +19,7 @@ constexpr std::array<QPoint, 4> kNeighborOffsets{
     QPoint(-1, 0),
 };
 
-} // namespace
+}
 
 void PrimGenerator::generate(Maze& maze) {
     maze.reset();

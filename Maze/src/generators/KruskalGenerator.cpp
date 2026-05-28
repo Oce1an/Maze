@@ -52,7 +52,7 @@ std::mt19937 makeRng() {
     return std::mt19937(static_cast<std::mt19937::result_type>(QRandomGenerator::global()->generate64()));
 }
 
-} // namespace
+}
 
 void KruskalGenerator::generate(Maze& maze) {
     maze.reset();
